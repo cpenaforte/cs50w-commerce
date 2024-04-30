@@ -1,0 +1,82 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Create an Auction Listing</h2>
+
+    {% if error != "" %}
+        <p class="text-danger">{{ error }}</p>
+    {% endif %}
+
+    {% if is_edit %}
+        <form action="{% url 'auctions:edit_listing' listing.id %}"
+            method="POST"
+            class="d-flex flex-column"
+        >
+    {% else %}
+        <form action="{% url 'auctions:create' %}"
+            method="POST"
+            class="d-flex flex-column"
+        >
+    {% endif %}
+        {% csrf_token %}
+        <table>
+            <tbody>
+                <tr>
+                    <td class="font-weight-bold">
+                        {{ form.item_name.label_tag }}
+                    </td>
+                    <td>
+                        {{ form.item_name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="font-weight-bold">
+                        {{ form.description.label_tag }}
+                    </td>
+                    <td>
+                        {{ form.description }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="font-weight-bold">
+                        {{ form.starting_bid.label_tag }}
+                    </td>
+                    <td>
+                        {{ form.starting_bid }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="font-weight-bold">
+                        {{ form.final_date.label_tag }}
+                    </td>
+                    <td>
+                        {{ form.final_date }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="font-weight-bold">
+                        {{ form.image_url.label_tag }}
+                    </td>
+                    <td>
+                        {{ form.image_url }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="font-weight-bold">
+                        {{ form.category_title.label_tag }}
+                    </td>
+                    <td>
+                        {{ form.category_title }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">
+            {% if is_edit %}
+                Edit Listing
+            {% else %}
+                Create Listing
+            {% endif %}
+        </button>
+    </form>
+{% endblock %}

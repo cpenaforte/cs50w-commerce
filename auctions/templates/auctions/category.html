@@ -1,0 +1,71 @@
+{% extends "auctions/layout.html" %}
+
+{% load static %}
+{% load custom_tags %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>{{ category }}</h2>
+            <a href="{% url 'auctions:categories' %}" class="btn btn-primary">Categories</a>
+        </div>
+
+        {% if listings %}
+            <ul class="m-0 p-0">
+                {% for listing in listings %}
+                    {% now "Y-m-d G:i:s" as today %}
+                    <li class="d-flex align-items-center my-3 mx-0 p-3 border" style="gap: 16px;">
+                        {% if listing.image_url %}
+                        <img src="{{ listing.image_url }}"
+                            width="320px"
+                            height="180px"
+                            style="object-fit:scale-down;"
+                            alt="Image of {{ listing.item_name }}"
+                        >
+                        {% else %}
+                        <img src="{% static 'auctions/images/no-image.png' %}"
+                            width="320px"
+                            height="180px"
+                            style="object-fit:scale-down;"
+                            alt="No image available"
+                        >
+                        {% endif %}
+                        <div class="d-flex flex-column"
+                            style="flex: 1 0 auto;"
+                        >
+                            <div class="d-flex justify-content-end"
+                                style="gap:8px;"
+                            >
+                                {% if not listing.active or today > listing.final_date|date:"Y-m-d G:i:s" %}
+                                    <span class="badge badge-pill badge-danger">
+                                        {% if not active %}
+                                            Auction closed
+                                        {% else %}
+                                            Auction ended
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                                {% if listing.current_bid and listing.current_bid.bidder.id == user.id and today > listing.final_date|date:"Y-m-d G:i:s" %}
+                                    <span class="badge badge-pill badge-success">Won</span>
+                                {% endif %}
+                            </div>
+                            <a class="h5" href="{% url 'auctions:listing' listing.id %}">{{ listing.item_name }}</a>
+                            <p><strong>Starting bid:</strong> {{ listing.starting_bid|format_money }}</p>
+                            {% if listing.current_bid != None %}
+                                <p><strong>Highest bid:</strong> {{ listing.current_bid.bid|format_money }}</p>
+                            {% else %}
+                                <p>No bids yet</p>
+                            {% endif %}
+                            <p><strong>Created at: </strong>{{ listing.created_at }}</p>
+                            <p><strong>Until: </strong>{{ listing.final_date }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No lists in this category.</p>
+        {% endif %}
+    {% else %}
+        <p>You must be signed in to view this page.</p>
+    {% endif %}
+{% endblock %}

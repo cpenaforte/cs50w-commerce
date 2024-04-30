@@ -1,0 +1,63 @@
+{% extends "auctions/layout.html" %}
+
+{% load static %}
+{% load custom_tags %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <h2>Your Listings</h2>
+        
+        {% if not auction_listings %}
+            <p>You have no listings created.</p>
+        {% else %}
+            <ul class="m-0 p-0">
+                {% for listing in auction_listings %}
+                    {% now "Y-m-d G:i:s" as today %}
+                    <li class="d-flex align-items-center my-3 mx-0 p-3 border" style="gap: 16px; list-style: none;">
+                        {% if listing.image_url %}
+                            <img src="{{ listing.image_url }}"
+                                width="320px"
+                                height="180px"
+                                style="object-fit:scale-down;"
+                                alt="Image of {{ listing.item_name }}"
+                            >
+                        {% else %}
+                            <img src="{% static 'auctions/images/no-image.png' %}"
+                                width="320px"
+                                height="180px"
+                                style="object-fit:scale-down;"
+                                alt="No image available"
+                            >
+                        {% endif %}
+                        <div class="d-flex flex-column" style="flex: 1 0 auto;">
+                            <div class="d-flex justify-content-end"
+                                style="gap:8px;"
+                            >
+                                {% if not listing.active or today > listing.final_date|date:"Y-m-d G:i:s" %}
+                                    <span class="badge badge-pill badge-danger">
+                                        {% if not active %}
+                                            Auction closed
+                                        {% else %}
+                                            Auction ended
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <a class="h5" href="{% url 'auctions:listing' listing.id %}">{{ listing.item_name }}</a>
+                            <p><strong>Starting bid:</strong> {{ listing.starting_bid|format_money }}</p>
+                            {% if listing.current_bid != None %}
+                                <p><strong>Highest bid:</strong> {{ listing.current_bid.bid }}</p>
+                            {% else %}
+                                <p>No bids yet</p>
+                            {% endif %}
+                            <p><strong>Created at: </strong>{{ listing.created_at }}</p>
+                            <p><strong>Until: </strong>{{ listing.final_date }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% else %}
+        <p>You must be signed in to view this page.</p>
+    {% endif %}
+{% endblock %}
